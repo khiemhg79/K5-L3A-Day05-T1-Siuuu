@@ -298,3 +298,7 @@ Ba tiêu chí đều chấm bằng cách nhìn màn hình hoặc đọc đoạn 
 
 ## §7. Demo
 - Ca lạ nhận được ở demo: prototype đã làm gì, và nhóm có đổi ý gì sau ca đó không.
+- Nhóm chưa nhận được ca lạ, và nếu có nhận được ca lạ thì prototype sẽ trả về 
+Trợ lý AI · không phải dược sĩ
+Mình chưa chắc thuốc này cho ai dùng. Trước khi gợi ý, cho mình hỏi một câu: ai sẽ dùng thuốc?
+Nút: Mình, người lớn, khoẻ mạnh · Người nhà (trẻ em, người già, bà bầu) · Mình đang mang thai / cho con bú
