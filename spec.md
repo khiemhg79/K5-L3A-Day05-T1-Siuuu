@@ -14,7 +14,7 @@
 
 | Một người dùng | Một việc | Một quyết định của AI | Một kết quả |
 |---|---|---|---|
-| khách | nhắn hỏi "tôi (hoặc người nhà) bị X, có thuốc gì không" | tự gợi ý · hỏi sàng lọc · chuyển dược sĩ · khuyên đi khám ngay | người dùng thuốc không nhận sai sản phẩm, ca nguy hiểm không nằm trong hàng chờ |
+| khách | nhắn hỏi "tôi (hoặc người nhà) bị X, có thuốc gì không" | tự gợi ý · hỏi sàng lọc · chuyển dược sĩ · khuyên đi khám ngay | người dùng thuốc không nhận sai sản phẩm, ca nguy hiểm không được nằm trong hàng chờ |
 
 **AI được thêm quyền gì so với hôm nay.** Mục "Sản phẩm thật hôm nay" cho thấy AI chỉ trả lời giá, tồn kho, khuyến mãi; câu chuyên môn chuyển hết cho dược sĩ, và công khai chưa nói AI dựa vào dấu hiệu nào để chuyển. Ở lát cắt này AI được thêm quyền **gợi ý sản phẩm** và **tự quyết khi nào chuyển, khi nào bảo đi khám**. Sai theo hướng gợi ý thừa thì người uống thuốc chịu và không đảo được; sai theo hướng chuyển thừa thì chỉ tốn vài phút của dược sĩ. Vì vậy hướng sai chấp nhận được là "chuyển thừa".
 
