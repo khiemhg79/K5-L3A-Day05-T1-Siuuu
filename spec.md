@@ -1,4 +1,6 @@
-**Lớp:** H210 · **Bàn / zone:** 04 · **Track:** 01 - Healthcare
+# Bài nộp LAB5 — T1 Y tế · Nhóm Siuuu
+
+**Lớp:** H210 · **Bàn / zone:** 04 · **Track:** T1 - Healthcare
 
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
@@ -205,13 +207,94 @@ Cái giá: khách nửa đêm ở K1 không nhận được câu "được / kh�
 
 ---
 
-## §5. Prototype  (chặng 5)
-- Link hoặc file · công cụ · phần nào mock · có lời gọi AI thật không.
-- 1–2 ảnh có đánh số; mỗi số: thể hiện gì · nguyên tắc HAX/PAIR nào · mức tự chủ nào.
-- Quyết định: cách hiện độ chắc/bằng chứng và điều khiển mức tự chủ — đã nghĩ tới cách nào khác, vì sao chọn cách này.
+## §5. Prototype
 
-## §6. Tốt là gì  (chặng 6 — nhẹ, bỏ được nếu thiếu giờ)
-- 3 tiêu chí Pass/Fail chấm được; thiết kế của nhóm đạt tiêu chí nào trên 2 kịch bản đắt nhất; lỗi còn lại.
+- **File:** [`prototype/index.html`](prototype/index.html) — mở trực tiếp bằng trình duyệt, không cần cài gì.
+- **Công cụ:** một file HTML + CSS + JavaScript thuần, dựng cùng coding agent (Claude).
+- **Có lời gọi AI thật không:** **không**. Mọi câu AI nói là câu nhóm viết sẵn ở §3.
+- **Phần nào mock:**
+  - Việc "AI hiểu tin nhắn" ở ô gõ ca lạ được giả lập bằng **luật từ khoá**: có dấu hiệu nguy hiểm → cấp cứu; có tên thuốc kê đơn → cấm; có bệnh mạn tính hoặc đang dùng thuốc, có nhóm nguy cơ (bé, bầu, bố mẹ, tuổi…), hoặc triệu chứng kéo dài → chuyển dược sĩ; còn lại → hỏi ai dùng thuốc rồi sàng lọc.
+  - Dược sĩ, sản phẩm, cửa hàng, hàng chờ đều là dữ liệu dựng; "Nhà thuốc Mẫu" là tên dựng. Nút **Gọi 115** là link gọi điện thật (`tel:115`), các nút đặt hàng không gửi đi đâu.
+  - Màn hình dược sĩ chỉ giữ **một ca tại một thời điểm**; "quá 3 phút chưa nhận" chỉ hiện bằng chữ, chưa đếm giờ thật.
+- **Các ca bấm được:** chọn ở thanh trên cùng — *Ca khó · Bé sốt* (K1, K8, và nhánh cấp cứu khi bấm "Co giật"/"Dưới 3 tháng"), *Ca thường · Nước muối* (K3), *Ca cấm · Kháng sinh không đơn* (K6), *Ca lạ · tự gõ* (gõ K2 "bố mình 70 tuổi tức ngực, mua thuốc gì" để xem nhánh cấp cứu). Bên phải màn hình luôn có bảng mức 5 tool (tool vừa gọi được tô vàng) và log "Hệ thống vừa làm gì".
+
+### Ảnh có đánh số
+
+**Ảnh 1 — Màn hình khách, ca K1 từ đầu tới cuối** (`prototype/anh-1-khach.png`)
+
+![Ảnh 1 — màn hình khách, ca bé sốt](prototype/anh-1-khach.png)
+
+**Ảnh 2 — Màn hình dược sĩ nhận ca K1, trước khi gửi trả lời** (`prototype/anh-2-duoc-si-tra-loi.png`)
+
+![Ảnh 2 — màn hình dược sĩ](prototype/anh-2-duoc-si-tra-loi.png)
+
+| Số | Ở đâu | Thể hiện gì | Nguyên tắc | Mức tự chủ |
+|---|---|---|---|---|
+| **1** | Ảnh 1, đầu mọi tin AI | Nhãn "Trợ lý AI · không phải dược sĩ" | HAX G1 (+ Luật AI 134/2025, Điều 11 khoản 1) | — |
+| **2** | Ảnh 1, ô vàng trong tin AI đầu tiên · Ảnh 2, ô vàng "AI chưa chắc" | Nói rõ AI đang thiếu thông tin gì (tuổi bé; cân nặng và tên thuốc ở nhà) | HAX G2 | `goi_y_san_pham` không được gọi vì chưa qua luật |
+| **3** | Ảnh 1, hai câu hỏi có nút chọn | Hỏi lại một câu mỗi lần (dấu hiệu nguy hiểm, rồi tuổi) thay vì đoán | HAX G10 | `goi_y_san_pham` bị chặn cho tới khi biết người dùng thuốc |
+| **4** | Ảnh 1, dải đỏ đầu khung chat | Đường lui cấp cứu luôn có, không phụ thuộc AI nhận diện đúng | PAIR Errors + Graceful Failure | `khuyen_di_kham` **tự làm** |
+| **5** | Ảnh 1, dòng "Vì sao chuyển" và "Dựa vào" · Ảnh 2, "Vì sao AI chuyển" | Căn cứ của quyết định, để khách và dược sĩ tự kiểm | HAX G11 + PAIR Explainability + Trust | `chuyen_duoc_si` **tự làm** |
+| **6** | Ảnh 1, thẻ "Tóm tắt gửi dược sĩ" có nút **Sửa tóm tắt** | Khách sửa thông tin AI tóm tắt sai trước khi dược sĩ đọc | HAX G9 | `chuyen_duoc_si` tự làm, kèm tóm tắt khách sửa được |
+| **7** | Ảnh 1, nút **Không lưu** và **Huỷ đặt** | Gạt bỏ một việc chỉ bằng một lần bấm | HAX G8 | `luu_ghi_chu_suc_khoe` cần khách duyệt · việc đặt giữ có hoàn tác |
+| **8** | Ảnh 1, thẻ "Lưu thông tin…?" và nhãn "DS. Trần Lan đã duyệt gợi ý này" · Ảnh 2, ô "Kèm gợi ý sản phẩm — dược sĩ duyệt" (tắt mặc định) | Người có quyền bấm xác nhận trước khi việc khó đảo xảy ra | PAIR Feedback + Control | `luu_ghi_chu_suc_khoe` **cần khách duyệt** · `goi_y_san_pham` **cần dược sĩ duyệt** (ca trẻ em) |
+
+Mức **cấm** (`ban_thuoc_ke_don`) không có trong 2 ảnh vì nằm ở ca khác: bấm *Ca cấm · Kháng sinh không đơn* sẽ thấy tin từ chối **không có nút mua nào**, chỉ có hai nút sang dược sĩ.
+
+Đủ bốn yêu cầu của rubric R5 về mức tự chủ trên màn hình: **tự làm có hoàn tác** (Huỷ đặt, số 7) · **cần duyệt có xác nhận** (số 8) · **có đường chuyển người** (số 5, 6 và toàn bộ Ảnh 2) · **việc cấm không có nút làm** (ca kháng sinh).
+
+### Quyết định: cách hiện độ chắc, bằng chứng và điều khiển mức tự chủ
+
+**Độ chắc — chọn câu "Mình chưa chắc: [thiếu gì]" (số 2).**
+- *Đã cân nhắc:* con số phần trăm ("độ tin cậy 62%"); thanh màu xanh/vàng/đỏ; không hiện gì.
+- *Loại phần trăm:* khách lo lắng lúc nửa đêm không biết 62% nghĩa là nên làm gì; con số còn tạo cảm giác "đã tính toán" nên dễ tin quá mức.
+- *Loại thanh màu:* cho biết AI chưa chắc nhưng không nói **thiếu gì**, nên khách không biết bổ sung thông tin nào.
+- *Loại không hiện gì:* vi phạm G2; câu hỏi lại trông như AI làm khó khách (đúng cái làm khách gắt ở K8).
+- *Chọn câu chữ vì:* nó nói luôn điều khách cần làm tiếp (cho biết tuổi bé), và cùng một câu đó cho dược sĩ biết phải hỏi thêm gì (Ảnh 2).
+
+**Bằng chứng — chọn dòng "Vì sao / Dựa vào" bằng lời (số 5).**
+- *Đã cân nhắc:* dẫn link nguồn (dược thư, tờ hướng dẫn sử dụng).
+- *Loại link nguồn:* track không có dữ liệu nguồn nào như vậy; hiện link nguồn mà hệ thống không thực sự có chính là lỗi "dẫn nguồn không có" mà guide cảnh báo. Căn cứ thật duy nhất của AI là **những gì khách đã nói** và **luật của nhóm**, nên dòng "Dựa vào" chỉ trích hai thứ đó.
+
+**Điều khiển mức tự chủ — chọn nút đặt đúng chỗ của từng việc, không có công tắc chọn mức.**
+- *Đã cân nhắc:* công tắc chuyển 3 mức cho khách như prototype mẫu của giảng viên.
+- *Loại công tắc:* ở T1 mức tự chủ không do khách chọn mà do **luật theo người dùng thuốc** (§4). Cho khách bật "AI tự gợi ý" thì đúng khách ở K1 — người muốn câu trả lời ngay — sẽ bật nó. Vì vậy mức được thể hiện qua **cái có hoặc không có trên màn hình**: ca trẻ em không có nút Đặt; ca kháng sinh không có nút mua; ca nước muối có nút Đặt kèm Huỷ đặt. Bảng mức 5 tool và log bên phải chỉ để người xem demo thấy tool nào vừa chạy ở mức nào.
+
+**Dải đỏ cấp cứu cố định (số 4), thay vì chỉ hiện khi AI phát hiện dấu hiệu.**
+- *Loại "chỉ hiện khi AI phát hiện":* đúng ở chỗ AI bỏ sót thì khách không có đường nào (lỗi hệ thống ở K2, §3). Dải cố định tốn một dòng màn hình nhưng không phụ thuộc AI.
+
+**Dược sĩ duyệt bằng ô "Kèm gợi ý sản phẩm" tắt mặc định (số 8, Ảnh 2).**
+- *Đã cân nhắc:* AI gửi sẵn gợi ý, dược sĩ có nút "Thu hồi"; hoặc nút "Duyệt" lớn bên cạnh nút gửi.
+- *Loại "gửi sẵn rồi thu hồi":* khách có thể đã bấm Đặt trước khi dược sĩ kịp thu hồi — không đảo được.
+- *Loại nút "Duyệt" lớn:* dễ bấm theo thói quen. Ô tắt mặc định buộc dược sĩ chủ động bật, sau khi đã đọc tóm tắt ngay phía trên.
+
+---
+
+## §6. Tốt là gì
+
+### 3 tiêu chí Pass/Fail
+
+| # | Tiêu chí | Pass khi | Fail khi |
+|---|---|---|---|
+| **T1** | Không gợi ý sản phẩm khi chưa đủ căn cứ | Không có thẻ sản phẩm hay nút Đặt nào trên màn hình khách **trước khi biết người dùng thuốc là ai**; và với ca không qua luật (§4), **trước khi dược sĩ bật ô duyệt** | Có bất kỳ thẻ sản phẩm hay nút Đặt nào xuất hiện trước hai mốc đó |
+| **T2** | Ca nguy hiểm không nằm trong hàng chờ | Khi tin nhắn hoặc nút khách bấm có dấu hiệu nguy hiểm, **tin trả lời ngay sau đó** là thẻ "đi khám / gọi 115", không có câu hỏi nào đứng trước nó, không có thẻ sản phẩm, và ca bên dược sĩ được gắn **KHẨN** | AI hỏi thêm trước khi bảo đi khám, hoặc có thẻ sản phẩm, hoặc ca vào hàng chờ thường |
+| **T3** | Không nói liều | Không có tin nào **của AI** chứa con số liều (mg, ml, viên, lần/ngày, số giờ giữa hai lần uống) | Có ít nhất một tin AI chứa con số liều |
+
+Ba tiêu chí đều chấm bằng cách nhìn màn hình hoặc đọc đoạn chat, không cần tranh luận.
+
+### Chấm thử thiết kế của nhóm trên 2 kịch bản đắt nhất
+
+| Kịch bản | T1 | T2 | T3 |
+|---|---|---|---|
+| **K1 · bé sốt** (cả nhánh khách gắt K8) | **Pass** — thẻ sản phẩm chỉ xuất hiện sau khi dược sĩ bật ô duyệt (Ảnh 1, số 8) | **Pass** — bấm "Co giật", "Li bì", "Khó thở" hoặc "Dưới 3 tháng" đều ra ngay thẻ đỏ, ca gắn KHẨN | **Pass** — nhánh gắt nói "liều cho trẻ tính theo cân nặng" nhưng không có con số |
+| **K2 · tức ngực** | **Pass** — không có thẻ sản phẩm nào | **Pass** với tin "bố mình 70 tuổi tức ngực…"; **Fail** khi khách viết "nặng ngực" (đã thử trên prototype: AI chuyển dược sĩ vào hàng chờ thường thay vì bảo đi khám) | **Pass** |
+
+### Lỗi còn lại
+
+1. **Nhận diện dấu hiệu nguy hiểm còn lọt (T2 Fail ở K2).** Cách viết khác ("nặng ngực", "khó chịu ở ngực") hoặc gõ không dấu ("tuc nguc") không được nhận ra. Hiện chỉ có dải đỏ cố định (số 4) che lỗ này, và nó phụ thuộc vào việc khách tự bấm. Cần một bộ eval riêng cho cách khách mô tả dấu hiệu nguy hiểm.
+2. **Khách trả lời sai câu sàng lọc.** Ở K1, nếu khách bấm "Không có dấu hiệu nào" trong khi bé đang li bì, thiết kế tin theo câu trả lời đó. Chỉ còn dược sĩ (đọc nguyên đoạn chat) và dải đỏ cứu được.
+3. **Quá hạn 3 phút chưa được kiểm.** Lúc nửa đêm ít dược sĩ trực; prototype chỉ ghi luật bằng chữ, chưa chứng minh ca trẻ em thực sự được đẩy lên dược sĩ trưởng ca.
+4. **Màn hình dược sĩ chỉ có một ca.** Chưa thử khi nhiều ca KHẨN và ca trẻ em đến cùng lúc thì thứ tự ưu tiên có đúng không.
 
 ## §7. Demo
 - Ca lạ nhận được ở demo: prototype đã làm gì, và nhóm có đổi ý gì sau ca đó không.

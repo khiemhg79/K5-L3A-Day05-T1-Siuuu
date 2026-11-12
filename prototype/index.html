@@ -186,7 +186,7 @@ const ann = n => `<span class="ann">${n}</span>`;
 /* ---------- 5 tool và mức tự chủ ---------- */
 const TOOLS = {
   goi_y_san_pham: ['rule', 'Tự làm nếu qua luật · còn lại dược sĩ duyệt',
-    'Thuốc đã uống thì không đảo được. Luật: AI chỉ tự gợi ý khi người dùng là người lớn tự dùng, không mang thai/cho bú, không bệnh nền hay thuốc khác, triệu chứng dưới 3 ngày, sản phẩm không kê đơn. Không bao giờ nói liều.'],
+    'Thuốc đã uống thì không đảo được. Luật 6 điều: AI chỉ tự gợi ý khi người dùng là người lớn tự dùng, không mang thai/cho bú, không bệnh nền hay thuốc khác, không dị ứng thuốc, triệu chứng dưới 3 ngày và chưa tự uống thuốc mà không đỡ, sản phẩm không kê đơn. Không bao giờ nói liều.'],
   chuyen_duoc_si: ['ok', 'Tự làm',
     'Chuyển thừa chỉ tốn vài phút của dược sĩ; chuyển thiếu thì trẻ nhỏ có thể nhận sai thuốc. Kèm tóm tắt để khách không phải kể lại.'],
   khuyen_di_kham: ['ok', 'Tự làm',
@@ -403,16 +403,21 @@ function caseKhangSinh() {
 }
 
 /* ---------- ca lạ: định tuyến theo từ khoá (mô phỏng) ---------- */
+/* Khớp nguyên từ: "ông" không được khớp vào chữ "không", "bà" không khớp vào "bàn". */
+const words = list => new RegExp('(?<![\\p{L}])(' + list + ')(?![\\p{L}])', 'u');
 function route(t) {
   const s = t.toLowerCase();
-  const danger = s.match(/khó thở|đau ngực|tức ngực|co giật|lơ mơ|ngất|li bì|tím tái|nôn ra máu|méo miệng|yếu nửa người/);
-  if (danger) return emergency('tin nhắn có dấu hiệu "' + danger[0] + '"', /bố|mẹ|ông|bà|con|bé|cháu|vợ|chồng/.test(s) ? 'người nhà của bạn' : 'bạn');
-  const rx = s.match(/kháng sinh|amoxicillin|augmentin|cefuroxim|huyết áp|tiểu đường|insulin|thuốc ngủ|an thần|corticoid/);
+  const danger = s.match(words('khó thở|đau ngực|tức ngực|co giật|lơ mơ|ngất|li bì|tím tái|nôn ra máu|méo miệng|yếu nửa người'));
+  if (danger) return emergency('tin nhắn có dấu hiệu "' + danger[0] + '"', words('bố|mẹ|ông|bà|con|bé|cháu|vợ|chồng').test(s) ? 'người nhà của bạn' : 'bạn');
+  const rx = s.match(words('kháng sinh|amoxicillin|augmentin|cefuroxim|insulin|thuốc ngủ|an thần|corticoid|thuốc huyết áp'));
   if (rx) return forbidden(rx[0]);
-  const risk = s.match(/bầu|mang thai|cho con bú|\bcon\b|\bbé\b|cháu|bố|mẹ|ông|bà|tuổi/);
+  const chronic = s.match(words('tiểu đường|huyết áp|tim mạch|hen|suy thận|bệnh nền|đang uống thuốc|đang dùng thuốc'));
+  if (chronic) return transfer([['Tin khách', t], ['Người dùng thuốc', 'Có bệnh mạn tính hoặc đang dùng thuốc ("' + chronic[0] + '")']],
+    'người dùng thuốc có bệnh mạn tính hoặc đang dùng thuốc khác — dễ tương tác, dược sĩ trả lời.', 'Ca lạ · bệnh nền', 'Chưa biết đang dùng thuốc gì.');
+  const risk = s.match(words('bầu|mang thai|cho con bú|con|bé|cháu|bố|mẹ|ông|bà|tuổi'));
   if (risk) return transfer([['Tin khách', t], ['Người dùng thuốc', 'Thuộc nhóm cần dược sĩ ("' + risk[0] + '")']],
     'người dùng thuốc thuộc nhóm trẻ em, người mang thai hoặc người cao tuổi.', 'Ca lạ · ' + risk[0], 'Chưa sàng lọc đủ: tuổi, thuốc đang dùng, bệnh nền.');
-  const long = s.match(/nhiều ngày|cả tuần|tuần nay|không đỡ|không khỏi|mạnh hơn/);
+  const long = s.match(/nhiều ngày|cả tuần|tuần nay|không đỡ|không khỏi|vẫn sốt|vẫn đau|mạnh hơn/);
   if (long) return transfer([['Tin khách', t]], 'triệu chứng kéo dài hoặc đã tự dùng thuốc không đỡ — không bán "loại mạnh hơn".', 'Ca lạ · kéo dài', 'Chưa biết đã dùng thuốc gì, bao lâu.');
   ai(`<div class="unsure">${ann(2)} Mình chưa chắc thuốc này cho ai dùng.</div>
       Trước khi gợi ý, cho mình hỏi một câu ${ann(3)}: <b>ai sẽ dùng thuốc?</b>`,
@@ -429,7 +434,7 @@ function screen(t) {
       ['Không có điều nào', () => {
         productCard('Một sản phẩm không kê đơn hợp triệu chứng (dựng)',
           'bạn tự dùng, người lớn, không mang thai, không thuốc khác, không dị ứng, triệu chứng dưới 3 ngày — qua luật tự gợi ý.');
-        log('goi_y_san_pham', 'rule', 'tự làm · qua luật', '· đã qua 5 câu sàng lọc');
+        log('goi_y_san_pham', 'rule', 'tự làm · qua luật', '· đã qua luật 6 điều');
         ai('Nếu sau 3 ngày chưa đỡ, hoặc có dấu hiệu nặng, đừng mua "loại mạnh hơn" — nhắn lại để gặp dược sĩ.',
           [btn('Mình muốn hỏi dược sĩ', 'ghost', b => { b.disabled = true; user('Mình muốn hỏi dược sĩ'); later(() => transfer([['Tin khách', t], ['Sàng lọc', 'Người lớn tự dùng, không yếu tố nguy cơ']], 'khách muốn gặp dược sĩ.', 'Ca lạ · khách chủ động hỏi', 'Không có.')); })]);
       }, 'primary'],
