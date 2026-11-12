@@ -1,4 +1,4 @@
-**Lớp:** H210 · **Bàn / zone:** 04 · **Track:** 01 - Healthcare
+**Lớp:** H210 · **Bàn / zone:** 02 · **Track:** 01 - Healthcare
 
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
